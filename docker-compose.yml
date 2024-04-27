@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  redis:
+    container_name: "poizon_shop_redis"
+    image: redis:alpine
+    volumes:
+      - redis-data:/data
+    command:
+      - redis-server
+    restart: on-failure
+    ports:
+      - "6380:6379"
+
+  bot:
+    container_name: "poizon_shop_app"
+    build: .
+    depends_on:
+      redis:
+        condition: "service_started"
+    env_file:
+      - ./.env
+
+    command: sh -c "python3 main.py"
+
+volumes:
+  redis-data:
+    driver: local
